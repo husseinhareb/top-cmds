@@ -22,24 +22,32 @@ fn fetch_shell() -> String {
 }
 
 fn fetch_file(shell: &str) -> String {
+    let file_path: &str;
+
     match shell {
         FISH_SHELL => {
             println!("Using Fish shell");
-            
+            file_path = "HOME/.local/share/fish/fish_history"; // Assign file path
         }
         ZSH_SHELL => {
             println!("Using Zsh shell");
+            file_path = "HOME/.zsh_history";
         }
         BASH_SHELL => {
             println!("Using Bash shell");
+            file_path = "HOME/.bash_history";
         }
         _ => {
             println!("Unknown shell");
+            file_path = ""; 
         }
     }
+
+    file_path.to_string() 
 }
 
 fn main() {
     let shell = fetch_shell();
-    fetch_file(&shell);
+    let file_path = fetch_file(&shell);
+    println!("File path: {}", file_path);
 }
