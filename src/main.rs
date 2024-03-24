@@ -30,7 +30,7 @@ fn fetch_file(shell: &str) -> String {
     match shell {
         FISH_SHELL => {
             println!("Using Fish shell");
-            file_path = ".local/share/fish/fish_history"; // Assign file path
+            file_path = ".local/share/fish/fish_history"; 
         }
         ZSH_SHELL => {
             println!("Using Zsh shell");
@@ -54,23 +54,16 @@ fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
 
     if let Ok(file) = File::open(Path::new(&std::env::var("HOME").unwrap()).join(file_path)) {
         let reader = io::BufReader::new(file);
-        let mut skip_next_line = false;
 
         for line in reader.lines() {
             if let Ok(command) = line {
-                if skip_next_line {
-                    skip_next_line = false;
-                    continue;
-                }
 
                 match shell {
                     FISH_SHELL => {
                         if command.starts_with("- cmd:") {
                             let cleaned_command = command.chars().skip(6).collect::<String>();
                             history.push(cleaned_command);
-                        } else if command.starts_with("  paths:") {
-                            skip_next_line = true;
-                        }
+                        } 
                     }
                     _ => {
                         history.push(command);
@@ -95,6 +88,7 @@ fn main() {
     
     let history = fetch_history(&file_path,&shell);
     println!("History:");
+    println!("{}", history.len());
     for command in &history {
         println!("{}", command);
     }
