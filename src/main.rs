@@ -3,9 +3,9 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-const FISH_SHELL: &str = "/usr/bin/fish";
-const ZSH_SHELL: &str = "/usr/bin/zsh";
-const BASH_SHELL: &str = "/usr/bin/bash";
+const FISH_SHELL: [&str; 2] = ["/usr/bin/fish", "/bin/fish"];
+const ZSH_SHELL: [&str; 2] = ["/usr/bin/zsh", "/bin/zsh"];
+const BASH_SHELL: [&str; 2] = ["/usr/bin/bash", "/bin/bash"];
 
 fn fetch_shell() -> String {
     let output = Command::new("sh")
@@ -27,26 +27,21 @@ fn fetch_shell() -> String {
 fn fetch_file(shell: &str) -> String {
     let file_path: &str;
 
-    match shell {
-        FISH_SHELL => {
-            println!("Using Fish shell");
-            file_path = ".local/share/fish/fish_history"; 
-        }
-        ZSH_SHELL => {
-            println!("Using Zsh shell");
-            file_path = ".zsh_history";
-        }
-        BASH_SHELL => {
-            println!("Using Bash shell");
-            file_path = ".bash_history";
-        }
-        _ => {
-            println!("Unknown shell");
-            file_path = ""; 
-        }
+    if FISH_SHELL.contains(&shell) {
+        println!("Using Fish shell");
+        file_path = ".local/share/fish/fish_history";
+    } else if ZSH_SHELL.contains(&shell) {
+        println!("Using Zsh shell");
+        file_path = ".zsh_history";
+    } else if BASH_SHELL.contains(&shell) {
+        println!("Using Bash shell");
+        file_path = ".bash_history";
+    } else {
+        println!("Unknown shell");
+        file_path = "";
     }
 
-    file_path.to_string() 
+    file_path.to_string()
 }
 
 fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
@@ -57,17 +52,11 @@ fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
 
         for line in reader.lines() {
             if let Ok(command) = line {
-
-                match shell {
-                    FISH_SHELL => {
-                        if command.starts_with("- cmd:") {
-                            let cleaned_command = command.chars().skip(6).collect::<String>();
-                            history.push(cleaned_command);
-                        } 
-                    }
-                    _ => {
-                        history.push(command);
-                    }
+                if FISH_SHELL.contains(&shell) && command.starts_with("- cmd:") {
+                    let cleaned_command = command.chars().skip(6).collect::<String>();
+                    history.push(cleaned_command);
+                } else {
+                    history.push(command);
                 }
             }
         }
@@ -78,17 +67,12 @@ fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
     history
 }
 
-
-
-
 fn main() {
     let shell = fetch_shell();
     let file_path = fetch_file(&shell);
-    println!("File path: {}", file_path);
-    
+    println!("Default Shell: {}", shell);
     let history = fetch_history(&file_path,&shell);
-    println!("History:");
-    println!("{}", history.len());
+    println!("History length: {}", history.len());
     for command in &history {
         println!("{}", command);
     }
