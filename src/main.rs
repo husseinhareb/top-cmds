@@ -29,13 +29,10 @@ fn fetch_file(shell: &str) -> String {
     let file_path: &str;
 
     if FISH_SHELL.contains(&shell) {
-        println!("Using Fish shell");
         file_path = ".local/share/fish/fish_history";
     } else if ZSH_SHELL.contains(&shell) {
-        println!("Using Zsh shell");
         file_path = ".zsh_history";
     } else if BASH_SHELL.contains(&shell) {
-        println!("Using Bash shell");
         file_path = ".bash_history";
     } else {
         println!("Unknown shell");
@@ -86,6 +83,32 @@ fn top_commands(history: &[String]) -> Vec<(&String, usize)> {
     sorted_counts.into_iter().take(3).collect()
 }
 
+fn create_responsive_art(first: i32, first_name: &str, first_count: usize, second: i32, second_name: &str, second_count: usize, third: i32, third_name: &str, third_count: usize, total: i32) {
+    let first_per = (first as f32 / total as f32) * 50.0;
+    let second_per = (second as f32 / total as f32) * 50.0;
+    let third_per = (third as f32 / total as f32) * 50.0;
+
+    let art = [
+        " ╔══════════════════════════════════════════════════════╗",
+        &format!(" ║{}║", " ".repeat(54)),    
+        &format!(" ║  {} ({} times) {}║", first_name, first_count, " ".repeat(50 - first_name.len() - 8 - first_count.to_string().len())), &format!(" ║  {}{}  ║", "█".repeat(first_per as usize), "░".repeat((50 - first_per as usize) as usize)),   
+        &format!(" ║{}║", " ".repeat(54)),                                                      
+        &format!(" ║  {} ({} times) {}║", second_name, second_count, " ".repeat(50 - second_name.len() - 8 - second_count.to_string().len())), &format!(" ║  {}{}  ║", "█".repeat(second_per as usize), "░".repeat((50 - second_per as usize) as usize)),     
+        &format!(" ║{}║", " ".repeat(54)),                                                      
+        &format!(" ║  {} ({} times) {}║", third_name, third_count, " ".repeat(50 - third_name.len() - 8 - third_count.to_string().len())), &format!(" ║  {}{}  ║", "█".repeat(third_per as usize), "░".repeat((50 - third_per as usize) as usize)),       
+        &format!(" ║{}║", " ".repeat(54)),                                                      
+        " ╚══════════════════════════════════════════════════════╝"
+    ];
+    
+
+    for line in art.iter() {
+        println!("{}", line);
+    }
+}
+
+
+
+
 fn main() {
     let shell = fetch_shell();
     let file_path = fetch_file(&shell);
@@ -93,10 +116,24 @@ fn main() {
     let history = fetch_history(&file_path, &shell);
     println!("History length: {}", history.len());
 
+    if shell.contains("fish"){
+        println!("Disclaimer: Fish shell doesn't save each time the command was run but it saves when was the last time ran so the occurrence of a command will never pass 5 or so")
+    }
+
     let top_3 = top_commands(&history);
 
-    println!("Top 3 most occurred strings:");
-    for (string, count) in top_3 {
-        println!("{}: {}", string, count);
+    if top_3.len() >= 3 {
+        let (first_command, first_count) = (&top_3[0].0, top_3[0].1);
+        let (second_command, second_count) = (&top_3[1].0, top_3[1].1);
+        let (third_command, third_count) = (&top_3[2].0, top_3[2].1);
+        
+        create_responsive_art(
+            first_count as i32, first_command, first_count, 
+            second_count as i32, second_command, second_count, 
+            third_count as i32, third_command, third_count, 
+            history.len() as i32
+        );
+    } else {
+        println!("Insufficient data to generate art.");
     }
 }
