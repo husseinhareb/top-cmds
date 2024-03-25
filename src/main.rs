@@ -2,6 +2,7 @@ use std::process::Command;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use std::collections::HashMap;
 
 const FISH_SHELL: [&str; 2] = ["/usr/bin/fish", "/bin/fish"];
 const ZSH_SHELL: [&str; 2] = ["/usr/bin/zsh", "/bin/zsh"];
@@ -52,11 +53,16 @@ fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
 
         for line in reader.lines() {
             if let Ok(command) = line {
-                if FISH_SHELL.contains(&shell) && command.starts_with("- cmd:") {
-                    let cleaned_command = command.chars().skip(6).collect::<String>();
-                    history.push(cleaned_command);
-                } else {
-                    history.push(command);
+                match shell {
+                    s if FISH_SHELL.contains(&s) => {
+                        if command.starts_with("- cmd:") {
+                            let cleaned_command = command.chars().skip(7).collect::<String>();
+                            history.push(cleaned_command);
+                        }
+                    }
+                    _ => {
+                        history.push(command);
+                    }
                 }
             }
         }
@@ -67,13 +73,30 @@ fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
     history
 }
 
+fn top_commands(history: &[String]) -> Vec<(&String, usize)> {
+    let mut counts = HashMap::new();
+
+    for command in history {
+        *counts.entry(command).or_insert(0) += 1;
+    }
+
+    let mut sorted_counts: Vec<(&String, usize)> = counts.into_iter().collect();
+    sorted_counts.sort_by(|a, b| b.1.cmp(&a.1));
+
+    sorted_counts.into_iter().take(3).collect()
+}
+
 fn main() {
     let shell = fetch_shell();
     let file_path = fetch_file(&shell);
     println!("Default Shell: {}", shell);
-    let history = fetch_history(&file_path,&shell);
+    let history = fetch_history(&file_path, &shell);
     println!("History length: {}", history.len());
-    for command in &history {
-        println!("{}", command);
+
+    let top_3 = top_commands(&history);
+
+    println!("Top 3 most occurred strings:");
+    for (string, count) in top_3 {
+        println!("{}: {}", string, count);
     }
 }
