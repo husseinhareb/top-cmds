@@ -8,6 +8,8 @@ const FISH_SHELL: [&str; 2] = ["/usr/bin/fish", "/bin/fish"];
 const ZSH_SHELL: [&str; 2] = ["/usr/bin/zsh", "/bin/zsh"];
 const BASH_SHELL: [&str; 2] = ["/usr/bin/bash", "/bin/bash"];
 
+
+
 fn fetch_shell() -> String {
     let output = Command::new("sh")
         .arg("-c")
@@ -110,11 +112,20 @@ fn create_responsive_art(first: i32, first_name: &str, first_count: usize, secon
 
 
 fn main() {
+    // ANSI escape codes for colors
+    let green = "\x1b[32m";
+    let red = "\x1b[31m";
+    let blue = "\x1b[34m";
+    let purple = "\x1b[35m";
+    let reset = "\x1b[0m";
+    // ANSI escape codes for styles
+    let normal = "\x1b[0m";
+    let bold = "\x1b[1m";
     let shell = fetch_shell();
     let file_path = fetch_file(&shell);
-    println!("Default Shell: {}", shell);
+    println!("•Default Shell: {} {} {} {}",green,bold, shell,reset);
     let history = fetch_history(&file_path, &shell);
-    println!("History length: {}", history.len());
+    println!("•History length: {} {} {} {}",green,bold, history.len(),reset);
 
     if shell.contains("fish"){
         println!("Disclaimer: Fish shell doesn't save each time the command was run but it saves when was the last time ran so the occurrence of a command will never pass 5 or so")
