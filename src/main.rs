@@ -1,40 +1,45 @@
-use std::process::Command;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use std::collections::HashMap;
-
-const FISH_SHELL: [&str; 2] = ["/usr/bin/fish", "/bin/fish"];
-const ZSH_SHELL: [&str; 2] = ["/usr/bin/zsh", "/bin/zsh"];
-const BASH_SHELL: [&str; 2] = ["/usr/bin/bash", "/bin/bash"];
+use std::fs;
 
 
-
-fn fetch_shell() -> String {
-    let output = Command::new("sh")
-        .arg("-c")
-        .arg(r#"grep "^$(whoami):" /etc/passwd | cut -d: -f7"#)
-        .output()
-        .expect("failed to execute process");
-
-    if output.status.success() {
-        let shell = String::from_utf8_lossy(&output.stdout);
-        shell.trim().to_string()
-    } else {
-        let error = String::from_utf8_lossy(&output.stderr);
-        eprintln!("Error executing command:\n{}", error);
-        String::new()
+fn get_parent_pid(pid: u32) -> Option<u32> {
+    if let Ok(status) = fs::read_to_string(format!("/proc/{}/status", pid)) {
+        for line in status.lines() {
+            if line.starts_with("PPid:") {
+                if let Some(ppid_str) = line.split_whitespace().nth(1) {
+                    if let Ok(ppid) = ppid_str.parse::<u32>() {
+                        return Some(ppid);
+                    }
+                }
+            }
+        }
     }
+    None
+}
+
+fn get_shell(pid: u32) -> Option<String> {
+    if let Ok(cmdline) = fs::read_to_string(format!("/proc/{}/cmdline", pid)) {
+        let parts: Vec<&str> = cmdline.split('\0').collect();
+        if let Some(shell_path) = parts.get(0) {
+            if let Some(shell_name) = Path::new(shell_path).file_name() {
+                return Some(shell_name.to_string_lossy().to_string());
+            }
+        }
+    }
+    None
 }
 
 fn fetch_file(shell: &str) -> String {
     let file_path: &str;
 
-    if FISH_SHELL.contains(&shell) {
+    if shell.contains("shell") {
         file_path = ".local/share/fish/fish_history";
-    } else if ZSH_SHELL.contains(&shell) {
+    } else if shell.contains("zsh") {
         file_path = ".zsh_history";
-    } else if BASH_SHELL.contains(&shell) {
+    } else if shell.contains("bash") {
         file_path = ".bash_history";
     } else {
         println!("Unknown shell");
@@ -53,7 +58,7 @@ fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
         for line in reader.lines() {
             if let Ok(command) = line {
                 match shell {
-                    s if FISH_SHELL.contains(&s) => {
+                    s if "fish".contains(&s) => {
                         if command.starts_with("- cmd:") {
                             let cleaned_command = command.chars().skip(7).collect::<String>();
                             history.push(cleaned_command);
@@ -89,15 +94,15 @@ fn create_responsive_art(first: i32, first_name: &str, first_count: usize, secon
     let first_per = (first as f32 / total as f32) * 50.0;
     let second_per = (second as f32 / total as f32) * 50.0;
     let third_per = (third as f32 / total as f32) * 50.0;
+    
     // ANSI escape codes for colors
-    let green = "\x1b[32m";
     let red = "\x1b[31m";
     let blue = "\x1b[34m";
     let purple = "\x1b[35m";
     let reset = "\x1b[0m";
     // ANSI escape codes for styles
-    let normal = "\x1b[0m";
     let bold = "\x1b[1m";
+
     let art = [
         " ╔══════════════════════════════════════════════════════╗",
         &format!(" ║{}║", " ".repeat(54)),    
@@ -122,20 +127,38 @@ fn create_responsive_art(first: i32, first_name: &str, first_count: usize, secon
 fn main() {
     // ANSI escape codes for colors
     let green = "\x1b[32m";
-    let red = "\x1b[31m";
-    let blue = "\x1b[34m";
-    let purple = "\x1b[35m";
     let reset = "\x1b[0m";
+    let blue = "\x1b[34m";
     // ANSI escape codes for styles
-    let normal = "\x1b[0m";
     let bold = "\x1b[1m";
-    let shell = fetch_shell();
-    let file_path = fetch_file(&shell);
-    println!("•Default Shell: {}{}{}{}",green,bold, shell,reset);
-    let history = fetch_history(&file_path, &shell);
-    println!("•History length: {}{}{}{}",green,bold, history.len(),reset);
 
-    if shell.contains("fish"){
+    let mut shell = String::new(); // Initialize shell variable
+
+    let mut current_pid = std::process::id();
+    loop {
+        if let Some(parent_pid) = get_parent_pid(current_pid) {
+            if parent_pid == 1 {
+                println!("Failed to determine the current shell.");
+                break;
+            }
+            if let Some(shell_name) = get_shell(parent_pid) {
+                println!("Current shell: {}", shell_name);
+                shell = shell_name; // Assign value to shell
+                break;
+            }
+            current_pid = parent_pid;
+        } else {
+            println!("Failed to determine the current shell.");
+            break;
+        }
+    }
+
+    let file_path = fetch_file(&shell);
+    println!("•Default Shell: {}{}{}{}", green, bold, shell, reset);
+    let history = fetch_history(&file_path, &shell);
+    println!("•History length: {}{}{}{}", green, bold, history.len(), reset);
+
+    if shell.contains("fish") {
         println!("Note: The Fish shell does not save every command invocation individually, but rather records the last time a command was executed. As a result, the occurrence count of a command may not exceed a few instances.");
     }
 
@@ -153,6 +176,6 @@ fn main() {
             history.len() as i32
         );
     } else {
-        println!("{}Insufficient data to generate art.{}{}",blue,bold,reset);
+        println!("{}Insufficient data to generate art.{}{}", blue, bold, reset);
     }
 }
