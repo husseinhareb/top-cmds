@@ -35,7 +35,7 @@ fn get_shell(pid: u32) -> Option<String> {
 fn fetch_file(shell: &str) -> String {
     let file_path: &str;
 
-    if shell.contains("shell") {
+    if shell.contains("fish") {
         file_path = ".local/share/fish/fish_history";
     } else if shell.contains("zsh") {
         file_path = ".zsh_history";
@@ -95,22 +95,19 @@ fn create_responsive_art(first: i32, first_name: &str, first_count: usize, secon
     let second_per = (second as f32 / total as f32) * 50.0;
     let third_per = (third as f32 / total as f32) * 50.0;
     
-    // ANSI escape codes for colors
-    let red = "\x1b[31m";
     let blue = "\x1b[34m";
-    let purple = "\x1b[35m";
     let reset = "\x1b[0m";
-    // ANSI escape codes for styles
+
     let bold = "\x1b[1m";
 
     let art = [
         " ╔══════════════════════════════════════════════════════╗",
         &format!(" ║{}║", " ".repeat(54)),    
-        &format!(" ║  {}{}1.{} ({} times) {} {}║",red,bold, first_name, first_count,reset, " ".repeat(50 - first_name.len() - 11 - first_count.to_string().len())), &format!(" ║  {}{}  ║", "█".repeat(first_per as usize), "░".repeat((50 - first_per as usize) as usize)),   
+        &format!(" ║  {}{}1.{} ({} times) {} {}║",blue,bold, first_name, first_count,reset, " ".repeat(50 - first_name.len() - 11 - first_count.to_string().len())), &format!(" ║  {}{}  ║", "█".repeat(first_per as usize), "░".repeat((50 - first_per as usize) as usize)),   
         &format!(" ║{}║", " ".repeat(54)),                                                      
         &format!(" ║  {}{}2.{} ({} times) {} {}║",blue,bold, second_name, second_count,reset, " ".repeat(50 - second_name.len() - 11 - second_count.to_string().len())), &format!(" ║  {}{}  ║", "█".repeat(second_per as usize), "░".repeat((50 - second_per as usize) as usize)),     
         &format!(" ║{}║", " ".repeat(54)),                                                      
-        &format!(" ║  {}{}3.{} ({} times) {} {}║",purple,bold, third_name, third_count,reset, " ".repeat(50 - third_name.len() - 11 - third_count.to_string().len())), &format!(" ║  {}{}  ║", "█".repeat(third_per as usize), "░".repeat((50 - third_per as usize) as usize)),       
+        &format!(" ║  {}{}3.{} ({} times) {} {}║",blue,bold, third_name, third_count,reset, " ".repeat(50 - third_name.len() - 11 - third_count.to_string().len())), &format!(" ║  {}{}  ║", "█".repeat(third_per as usize), "░".repeat((50 - third_per as usize) as usize)),       
         &format!(" ║{}║", " ".repeat(54)),                                                      
         " ╚══════════════════════════════════════════════════════╝"
     ];
@@ -125,14 +122,14 @@ fn create_responsive_art(first: i32, first_name: &str, first_count: usize, secon
 
 
 fn main() {
-    // ANSI escape codes for colors
     let green = "\x1b[32m";
     let reset = "\x1b[0m";
     let blue = "\x1b[34m";
-    // ANSI escape codes for styles
+    let red = "\x1b[31m";
+    
     let bold = "\x1b[1m";
 
-    let mut shell = String::new(); // Initialize shell variable
+    let mut shell = String::new(); 
 
     let mut current_pid = std::process::id();
     loop {
@@ -142,8 +139,7 @@ fn main() {
                 break;
             }
             if let Some(shell_name) = get_shell(parent_pid) {
-                println!("Current shell: {}", shell_name);
-                shell = shell_name; // Assign value to shell
+                shell = shell_name;
                 break;
             }
             current_pid = parent_pid;
@@ -154,12 +150,12 @@ fn main() {
     }
 
     let file_path = fetch_file(&shell);
-    println!("•Default Shell: {}{}{}{}", green, bold, shell, reset);
+    println!("•Current Shell: {}{}{}{}", green, bold, shell, reset);
     let history = fetch_history(&file_path, &shell);
     println!("•History length: {}{}{}{}", green, bold, history.len(), reset);
 
     if shell.contains("fish") {
-        println!("Note: The Fish shell does not save every command invocation individually, but rather records the last time a command was executed. As a result, the occurrence count of a command may not exceed a few instances.");
+        println!("{}{}Note: The Fish shell does not save every command invocation individually, but rather records the last time a command was executed. As a result, the occurrence count of a command may not exceed a few instances.{} ",red,bold,reset);
     }
 
     let top_3 = top_commands(&history);
