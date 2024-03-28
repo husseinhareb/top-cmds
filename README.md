@@ -1,6 +1,5 @@
 # top-cmds
-top-cmds is a linux command that allows the user to see the most used commands according to their shell.
-It has support for the most famous shells:
+top-cmds is a Linux command that allows the user to see the most used commands, accompanied by ASCII art, and it offers support for the most popular shells
 
 ## INSTALLATION
 
