@@ -41,7 +41,7 @@ fn fetch_file(shell: &str) -> String {
     if shell.contains("fish") {
         file_path = ".local/share/fish/fish_history";
     } else if shell.contains("zsh") {
-        file_path = ".zsh_history";
+        file_path = ".histfile";
     } else if shell.contains("bash") {
         file_path = ".bash_history";
     } else {
