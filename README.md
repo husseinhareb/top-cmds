@@ -8,6 +8,7 @@ top-cmds is a Linux command that allows the user to see the most used commands, 
   cd top-cmds/
   make install
 ```
+Rust should be installed on your system to build the binary.
 ## Screenshots
 
 ### bash 
