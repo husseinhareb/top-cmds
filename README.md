@@ -6,7 +6,8 @@ top-cmds is a Linux command that allows the user to see the most used commands, 
 ```
   git clone https://github.com/husseinhareb/top-cmds/
   cd top-cmds/
-  make install
+  make build
+  sudo make install
 ```
 Rust should be installed on your system to build the binary.
 ## Screenshots
