@@ -1,6 +1,6 @@
 use std::fs::{self, File};
 use std::path::PathBuf;
-use std::io::{self, prelude::*, BufRead, Write};
+use std::io::{self, prelude::*, BufRead, Write,BufReader};
 
 pub fn create_config() -> std::io::Result<()> {
     let config_dir = dirs::config_dir().expect("Unable to determine config directory");
@@ -71,21 +71,27 @@ pub fn write_nb_cmds(nb_cmds: i32) -> io::Result<()> {
 }
 
 // Function to read city name from config file
-pub fn read_nbs_cmds() -> io::Result<String> {
+pub fn read_nb_cmds() -> io::Result<i32> {
     let file_path = config_file()?;
     let file = File::open(&file_path)?;
-    let reader = io::BufReader::new(file);
+    let reader = BufReader::new(file);
 
     for line in reader.lines() {
         let line = line?;
         if line.trim().starts_with("nb_cmds") {
-            let nb_cmds = line.split_whitespace().skip(1).collect::<Vec<&str>>().join(" ");
+            let nb_cmds_str = line.split_whitespace().skip(1).next().ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidData, "Invalid format for nb_cmds")
+            })?;
+            let nb_cmds = nb_cmds_str.parse::<i32>().map_err(|_| {
+                io::Error::new(io::ErrorKind::InvalidData, "Failed to parse nb_cmds")
+            })?;
             return Ok(nb_cmds);
         }
     }
 
     Err(io::Error::new(io::ErrorKind::NotFound, "Number of commands not found"))
 }
+
 
 // Function to get the path of the config file
 fn config_file() -> Result<PathBuf, io::Error> {
