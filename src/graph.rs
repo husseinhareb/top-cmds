@@ -1,8 +1,4 @@
 use std::collections::HashMap;
-use std::io::{self, BufRead};
-use std::path::Path;
-use std::fs::File;
-use std::fs;
 use crate::shell::get_shell;
 use crate::history::fetch_file;
 use crate::shell::get_parent_pid;
@@ -57,7 +53,7 @@ fn ascii_graph(first: i32, first_name: &str, first_count: usize, second: i32, se
 
 
 
-fn output() {
+pub fn graph() {
 
 
     let mut shell = String::new(); 

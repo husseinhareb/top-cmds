@@ -1,4 +1,3 @@
-use std::fs::File;
 use std::fs;
 
 //Reading the status of a process from the status file of it's process folder

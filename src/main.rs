@@ -17,6 +17,7 @@ fn main() {
 
     if args.len() == 1 {
         let _ = config::create_config();
+        let _ = graph::graph();
         return;
     }
 

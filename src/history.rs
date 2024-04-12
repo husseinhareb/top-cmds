@@ -1,8 +1,6 @@
-use std::collections::HashMap;
 use std::io::{self, BufRead};
 use std::path::Path;
 use std::fs::File;
-use std::fs;
 
 //Fetching the history file path of the shell
 pub fn fetch_file(shell: &str) -> String {
