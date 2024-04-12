@@ -47,11 +47,24 @@ fn ascii_graph(commands: Vec<(&str, usize)>, total_commands: usize) {
         let remainder = max_chars - bar_length;
         let num: usize = i+1;
         let num_str: &str = &num.to_string();
-        let str_len = command.len() - num_str.len() - 9 - count.to_string().len();
+        let command_display = if command.len() > 30 {
+            // Truncate the command string to 30 characters and add two points
+            let truncated_command = &command[..30];
+            format!("{}..", truncated_command)
+        } else {
+            // Keep the original command string if it's 30 characters or shorter
+            command.to_string()
+        };
+        let mut str_len = command_display.len() + num_str.len() + 9 + count.to_string().len();
+        if str_len >= 44
+        {
+            str_len = 44;
+        }
         art.push(format!(
-            " ║  {}{}{}.{} {} ({} times){}║ \n ║  {}{}  ║", BLUE, BOLD, num, RESET, command, count, " ".repeat(44 - str_len)  , "█".repeat(bar_length), "░".repeat(remainder), 
+            " ║  {}{}{}.{} {} ({} times){}║ \n ║  {}{}  ║", BLUE, BOLD, num, RESET, command_display, count, " ".repeat(44 - str_len), "█".repeat(bar_length), "░".repeat(remainder)
         ));
     }
+    
 
     // Finish building the ASCII art
     art.push(format!(" ║{}║", " ".repeat(max_chars+4)));
