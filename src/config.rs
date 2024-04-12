@@ -89,8 +89,10 @@ pub fn read_nb_cmds() -> io::Result<i32> {
         }
     }
 
-    Err(io::Error::new(io::ErrorKind::NotFound, "Number of commands not found"))
+    // If nb_cmds variable is not found, return 3
+    Ok(3)
 }
+
 
 
 // Function to get the path of the config file

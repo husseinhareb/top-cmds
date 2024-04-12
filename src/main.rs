@@ -6,7 +6,7 @@ mod graph;
 mod shell;
 
 fn help() {
-    println!("Usage: top-cmds [options]");
+    println!("Usage: top-cmds [options] | top-cmds");
     println!("Options:");   
     println!("-h               Display this help message"); 
     println!("-s <number>      Set the number of most used commands");         
