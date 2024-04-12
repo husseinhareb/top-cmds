@@ -48,11 +48,9 @@ fn ascii_graph(commands: Vec<(&str, usize)>, total_commands: usize) {
         let num: usize = i+1;
         let num_str: &str = &num.to_string();
         let command_display = if command.len() > 30 {
-            // Truncate the command string to 30 characters and add two points
             let truncated_command = &command[..30];
             format!("{}..", truncated_command)
         } else {
-            // Keep the original command string if it's 30 characters or shorter
             command.to_string()
         };
         let mut str_len = command_display.len() + num_str.len() + 9 + count.to_string().len();
@@ -66,11 +64,9 @@ fn ascii_graph(commands: Vec<(&str, usize)>, total_commands: usize) {
     }
     
 
-    // Finish building the ASCII art
     art.push(format!(" ║{}║", " ".repeat(max_chars+4)));
     art.push(" ╚════════════════════════════════════════════════╝".to_string());
 
-    // Print the ASCII art
     for line in art {
         println!("{}", line);
     }
