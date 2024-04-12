@@ -47,8 +47,8 @@ fn ascii_graph(commands: Vec<(&str, usize)>, total_commands: usize) {
         let remainder = max_chars - bar_length;
         let num: usize = i+1;
         let num_str: &str = &num.to_string();
-        let command_display = if command.len() > 30 {
-            let truncated_command = &command[..30];
+        let command_display = if command.len() > 27 {
+            let truncated_command = &command[..27];
             format!("{}..", truncated_command)
         } else {
             command.to_string()
@@ -59,7 +59,7 @@ fn ascii_graph(commands: Vec<(&str, usize)>, total_commands: usize) {
             str_len = 44;
         }
         art.push(format!(
-            " ║  {}{}{}.{} {} ({} times){}║ \n ║  {}{}  ║", BLUE, BOLD, num, RESET, command_display, count, " ".repeat(44 - str_len), "█".repeat(bar_length), "░".repeat(remainder)
+            " ║  {}{}{}. {}{}{} ({} times){}{}║ \n ║  {}{}  ║\n ║{}║",BOLD,RED, num,RESET, BLUE,  command_display, count,RESET, " ".repeat(44 - str_len), "█".repeat(bar_length), "░".repeat(remainder)," ".repeat(max_chars+4)
         ));
     }
     
@@ -105,7 +105,7 @@ pub fn graph() {
 
     if shell.contains("fish") {
         println!(
-            "{}{}Note: The Fish shell does not save every command invocation\nindividually, but rather records the last time a command\nwas executed. As a result, the occurrence count of a\ncommand may not exceed a few instances.{} ",
+            "{}{}Note: The Fish shell does not save every command invocation\nindividually, but rather records the last couples times a command\nwas executed. As a result, the occurrence count of a\ncommand may not exceed a few instances.{} ",
             RED, BOLD, RESET
         );
     }
