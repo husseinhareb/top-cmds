@@ -15,7 +15,7 @@ fn read_proc_file(pid: u32, keyword: &str) -> Option<String> {
     None
 }
 //Getting parent PID of the current command (The shell the command ran in)
-fn get_parent_pid(pid: u32) -> Option<u32> {
+pub fn get_parent_pid(pid: u32) -> Option<u32> {
     read_proc_file(pid, "PPid:").and_then(|ppid_str| ppid_str.parse().ok())
 }
 

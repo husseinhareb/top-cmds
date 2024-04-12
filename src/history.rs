@@ -5,7 +5,7 @@ use std::fs::File;
 use std::fs;
 
 //Fetching the history file path of the shell
-fn fetch_file(shell: &str) -> String {
+pub fn fetch_file(shell: &str) -> String {
     let file_path: &str;
 
     if shell.contains("fish") {
@@ -24,7 +24,7 @@ fn fetch_file(shell: &str) -> String {
 
 
 //Fetching the history of commands for the shell history file
-fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
+pub fn fetch_history(file_path: &str, shell: &str) -> Vec<String> {
     let mut history = Vec::new();
 
     if let Ok(file) = File::open(Path::new(&std::env::var("HOME").unwrap()).join(file_path)) {

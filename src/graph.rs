@@ -3,8 +3,10 @@ use std::io::{self, BufRead};
 use std::path::Path;
 use std::fs::File;
 use std::fs;
-use crate::shell:get_shell;
+use crate::shell::get_shell;
 use crate::history::fetch_file;
+use crate::shell::get_parent_pid;
+use crate::history::fetch_history;
 
 const BLUE: &str = "\x1b[34m";
 const GREEN: &str = "\x1b[32m";
