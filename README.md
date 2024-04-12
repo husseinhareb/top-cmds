@@ -10,13 +10,22 @@ top-cmds is a Linux command that allows the user to see the most used commands, 
   sudo make install
 ```
 Rust should be installed on your system to build the binary.
+## USAGE
+```
+Usage: top-cmds [options] | top-cmds
+Options:
+-h               Display this help message
+-s <number>      Set the number of most used commands
+```
 ## Screenshots
 
 ### bash 
-![swappy-20240328_161459](https://github.com/husseinhareb/top-cmds/assets/88323940/e5335d7f-61f2-4629-a03c-a4e9023cc466)
+![swappy-20240412_205644-ezgif com-crop](https://github.com/husseinhareb/top-cmds/assets/88323940/079ac0fc-0951-4518-8493-a001eacff648)
+
 
 ### fish
-![swappy-20240328_161531](https://github.com/husseinhareb/top-cmds/assets/88323940/d78bdfa5-5658-4b25-8511-78d6ab91f209)
+![swappy-20240412_204939-ezgif com-crop](https://github.com/husseinhareb/top-cmds/assets/88323940/013402cb-174d-4207-8687-402223c45ede)
+
 
 ### zsh
 ![Screenshot from 2024-03-28 14-59-06](https://github.com/husseinhareb/top-cmds/assets/88323940/0b4270b0-1457-46c5-b5b0-f768c856c4fe)
