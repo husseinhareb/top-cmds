@@ -45,8 +45,11 @@ fn ascii_graph(commands: Vec<(&str, usize)>, total_commands: usize) {
     for (i, (command, count)) in commands.iter().enumerate() {
         let bar_length = percentages[i] as usize;
         let remainder = max_chars - bar_length;
+        let num: usize = i+1;
+        let num_str: &str = &num.to_string();
+        let str_len = command.len() - num_str.len() - 9 - count.to_string().len();
         art.push(format!(
-            " ║  {}{}{}.{} {} ({} times)║ \n ║  {}{}  ║", BLUE, BOLD, i + 1, RESET, command, count  , "█".repeat(bar_length), "░".repeat(remainder), 
+            " ║  {}{}{}.{} {} ({} times){}║ \n ║  {}{}  ║", BLUE, BOLD, num, RESET, command, count, " ".repeat(44 - str_len)  , "█".repeat(bar_length), "░".repeat(remainder), 
         ));
     }
 
