@@ -37,7 +37,7 @@ fn file_exists(file_path: &PathBuf) -> bool {
 
 
 
-// Function to write city name according to parameter into the config file
+// Function to write the number of commands according to parameter into the config file
 pub fn write_nb_cmds(nb_cmds: i32) -> io::Result<()> {
     let file_path = config_file()?;
     let mut file_content = String::new();
@@ -70,7 +70,7 @@ pub fn write_nb_cmds(nb_cmds: i32) -> io::Result<()> {
     Ok(())
 }
 
-// Function to read city name from config file
+// Function to read the number of commands from config file
 pub fn read_nb_cmds() -> io::Result<i32> {
     let file_path = config_file()?;
     let file = File::open(&file_path)?;
